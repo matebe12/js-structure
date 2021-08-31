@@ -1,58 +1,93 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+<div class="container">
+  <div class="status-field">
+    <div class="status-item">Loaded Item : 4</div>
   </div>
+  <div class="root" style="width:500px; height:500px; overflow:auto;">
+    <div class="item">
+    Item 1
+  </div>
+  <div class="item">
+    Item 2
+  </div>
+  <div class="item">
+    Item 3
+  </div>
+  <div class="item">
+    Item 4
+  </div>
+  <div class="scroll-detecting"></div>
+  </div>
+  
+</div>
 </template>
 
 <script>
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+  mounted() {
+   // const container = document.querySelector('.container')
+    const root = document.querySelector('.root')
+    const detector = document.querySelector('.scroll-detecting')
+    let currentIndex = document.querySelectorAll('.item').length + 1
+
+  function update() {
+    const statusEL = document.querySelector('.status-item')
+    const items = document.querySelectorAll('.item')
+
+    statusEL.innerText = `Loaded Item : ${items.length}`
+  }
+
+  function loadItem(count) {
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement('div')
+
+      div.classList.add('item')
+      div.innerText = `Item ${currentIndex++}`
+      root.appendChild(div)
+      console.log(currentIndex);
+    }
+    update()
+  }
+
+const io = new IntersectionObserver(entries => {
+  //console.log('',entries.unob);c
+  entries.forEach((item) => {
+console.log('intersectionRatio : ',item.intersectionRatio);
+    console.log('isIntersecting : ', item.isIntersecting);
+  });
+
+  if (entries.some(entry => entry.intersectionRatio > 0)) {
+    loadItem(10)
+    root.appendChild(detector)
+  }
+},{
+  root:document.querySelector('.root'),
+  rootMargin: '0px',
+  threshold: 0.1
+})
+  io.observe(detector)
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
+<style>
+.status-field {
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.status-item {
+  text-align: right;
+  padding: 1rem;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+.item {
+  padding: 10rem 2rem;
+  border-top: 2px solid gray;
 }
-a {
-  color: #42b983;
+.scroll-detecting {
+  width: 5px;
+  height: 5px;
 }
 </style>
